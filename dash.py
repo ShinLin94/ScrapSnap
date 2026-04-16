@@ -1,5 +1,42 @@
+from py_compile import main
 import streamlit as st
 import base64
+from python_image import capture_image
+from python_image import estimate_calories
+
+import torch
+import open_clip
+import torch.nn as nn
+
+@st.cache_resource
+def load_model():
+    # Load CLIP
+    clip, _, preprocess = open_clip.create_model_and_transforms(
+        'ViT-B-32', pretrained='openai'
+    )
+
+    checkpoint = torch.load('calorie_clip.pt', map_location='cpu', weights_only=False)
+    clip.load_state_dict(checkpoint['clip_state'], strict=False)
+
+    class RegressionHead(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.net = nn.Sequential(
+                nn.Linear(512, 512), nn.BatchNorm1d(512), nn.ReLU(), nn.Dropout(0.4),
+                nn.Linear(512, 256), nn.BatchNorm1d(256), nn.ReLU(), nn.Dropout(0.3),
+                nn.Linear(256, 64), nn.ReLU(), nn.Linear(64, 1)
+            )
+        def forward(self, x): return self.net(x)
+
+    head = RegressionHead()
+    head.load_state_dict(checkpoint['regressor_state'])
+
+    clip.eval()
+    head.eval()
+
+    return clip, head, preprocess
+
+
 
 st.set_page_config(page_title="ScrapSnap", layout="wide")
 
@@ -10,11 +47,13 @@ if 'last_val' not in st.session_state:
     st.session_state.last_val = 0
 
 with st.sidebar:
-    st.header("Input")
-    val = st.number_input("Calories:", min_value=0, step=100)
-    if st.button("Update"):
-        st.session_state.last_val = val
-        st.session_state.total_cals += val
+    if st.button("📸 Take Photo"):
+        # call your capture script or assume image.jpg exists
+        image_path = capture_image() #from arduino
+        calories = estimate_calories(image_path) # huggingface model
+
+        st.session_state.last_val = calories
+        st.session_state.total_cals += calories
 
 # Math
 curr = st.session_state.last_val
