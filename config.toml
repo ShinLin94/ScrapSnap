@@ -1,0 +1,38 @@
+assignment_name="A4_Cybersecurity"
+semester="F25"
+
+[config]
+    impl_to_use="Python"
+    autograder_version="5.2.2"
+
+    test_directory="./student_tests"
+
+    enforce_submission_limit=false
+    submission_limit=3
+
+    take_highest=true
+
+    allow_extra_credit=false
+    perfect_score=9
+    max_score=9
+
+
+[config.python]
+
+
+[build]
+
+    # Things that need to be considered when building
+    use_starter_code=false
+    use_data_files=false
+    
+    allow_private=true
+
+    build_student=true
+
+    build_gradescope=true
+
+    student_work_folder="student_work"
+    private_tests_regex='^test_private_?\w*\.py$'
+    public_tests_regex='^test_public_?\w*\.py$'
+
