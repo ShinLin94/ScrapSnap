@@ -1,13 +1,16 @@
-from py_compile import main
+# from py_compile import main
 import streamlit as st
 import base64
 from python_image import capture_image
-from python_image import estimate_calories
+# from estimate_calories import estimate_calories
 
+
+#### make image estimaton functions
+from PIL import Image
 import torch
 import open_clip
 import torch.nn as nn
-
+    
 @st.cache_resource
 def load_model():
     # Load CLIP
@@ -37,7 +40,19 @@ def load_model():
     return clip, head, preprocess
 
 
+def estimate_calories(image_path):
+    clip, head, preprocess = load_model()  # ✅ cached
 
+    img = preprocess(Image.open(image_path)).unsqueeze(0)
+
+    with torch.no_grad():
+        features = clip.encode_image(img)
+        calories = head(features).item()
+
+    return int(calories)
+
+
+# set up the streamlit page
 st.set_page_config(page_title="ScrapSnap", layout="wide")
 
 # --- 1. DATA ---
@@ -48,12 +63,23 @@ if 'last_val' not in st.session_state:
 
 with st.sidebar:
     if st.button("📸 Take Photo"):
-        # call your capture script or assume image.jpg exists
-        image_path = capture_image() #from arduino
-        calories = estimate_calories(image_path) # huggingface model
+        # # call your capture script or assume image.jpg exists
+        # image_path = capture_image() #from arduino
+        # calories = estimate_calories(image_path) # huggingface model
 
-        st.session_state.last_val = calories
-        st.session_state.total_cals += calories
+        # st.session_state.last_val = calories
+        # st.session_state.total_cals += calories
+        try:
+         with st.spinner("Capturing image..."):
+            image_path = capture_image()
+            calories = estimate_calories(image_path)
+
+            st.session_state.last_val = calories
+            st.session_state.total_cals += calories
+
+            st.success("Done!")
+        except Exception as e:
+            st.error(str(e))
 
 # Math
 curr = st.session_state.last_val
