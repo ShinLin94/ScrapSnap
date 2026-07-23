@@ -2,7 +2,6 @@
 import streamlit as st
 import base64
 from python_image import capture_image
-# from estimate_calories import estimate_calories
 
 
 #### make image estimaton functions
