@@ -40,7 +40,7 @@ def load_model():
 
 
 def estimate_calories(image_path):
-    clip, head, preprocess = load_model()  # ✅ cached
+    clip, head, preprocess = load_model()
 
     img = preprocess(Image.open(image_path)).unsqueeze(0)
 
@@ -54,7 +54,7 @@ def estimate_calories(image_path):
 # set up the streamlit page
 st.set_page_config(page_title="ScrapSnap", layout="wide")
 
-# --- 1. DATA ---
+# --- DATA ---
 if 'total_cals' not in st.session_state:
     st.session_state.total_cals = 0
 if 'last_val' not in st.session_state:
@@ -86,7 +86,7 @@ total = st.session_state.total_cals
 s_dol, s_fam = curr/2000 * 13.00, curr/3000
 t_dol, t_fam = total/2000 * 13.00, total/3000
 
-# --- 2. IMAGE ---
+# --- IMAGE ---
 def get_base64(file):
     try:
         with open(file, 'rb') as f:
@@ -96,7 +96,7 @@ def get_base64(file):
 
 img_base64 = get_base64("ScrapSnap 2.0.png")
 
-# --- 3. THE DISPLAY ---
+# --- THE DISPLAY ---
 if img_base64:
      
     html_code = f"""
