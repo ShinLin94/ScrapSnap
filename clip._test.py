@@ -3,7 +3,7 @@ import base64
 
 st.set_page_config(page_title="ScrapSnap", layout="wide")
 
-# --- 1. DATA ---
+# --- DATA ---
 if 'total_cals' not in st.session_state:
     st.session_state.total_cals = 0
 if 'last_val' not in st.session_state:
